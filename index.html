@@ -45,10 +45,18 @@
         .video-container {
             flex: 2;
             min-width: 300px;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
         }
 
-        #live-video {
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
             border-radius: 8px;
         }
 
@@ -122,10 +130,12 @@
 
     <main>
         <div class="video-container">
-            <video id="live-video" controls autoplay>
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+            <iframe id="live-video"
+                src="https://www.youtube.com/embed/videoseries?list=PL3J-C4n1o3iL9P0eQ9k4xR1F1jN1j1-1J"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
         </div>
 
         <div class="interactive-section">
@@ -156,7 +166,7 @@
         <div class="admin-section">
             <h3>Video Settings</h3>
             <label for="video-link">Video Link:</label>
-            <input type="text" id="video-link" placeholder="Paste video URL here" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+            <input type="text" id="video-link" placeholder="Paste YouTube URL here" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
             <button id="update-video-btn" style="margin-top: 0.5rem;">Update Video</button>
         </div>
         <div class="admin-section" style="margin-top: 1rem;">
@@ -174,7 +184,6 @@
     </div>
 
     <script>
-        // Poll results and variables are now in the global scope
         let pollResults = {
             js: 0,
             python: 0,
@@ -188,7 +197,6 @@
             const pollOptionsDiv = document.querySelector('.poll-options');
             const pollResultsDiv = document.getElementById('poll-results');
 
-            // Admin panel elements
             const settingsBtn = document.getElementById('settings-btn');
             const adminPanel = document.getElementById('admin-panel');
             const updateVideoBtn = document.getElementById('update-video-btn');
@@ -200,7 +208,6 @@
             const pollQuestion = document.getElementById('poll-question');
             const adminPollResults = document.getElementById('admin-poll-results');
 
-            // --- Comment and Poll Logic ---
             commentForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const commentText = commentInput.value;
@@ -218,7 +225,6 @@
                 commentsList.scrollTop = commentsList.scrollHeight;
             }
 
-            // Function to update both public and admin poll results
             function updatePollResults() {
                 pollResultsDiv.innerHTML = '';
                 adminPollResults.innerHTML = '';
@@ -235,7 +241,6 @@
                 }
             }
             
-            // Re-attach poll button listeners
             pollOptionsDiv.addEventListener('click', (e) => {
                 if (e.target.classList.contains('poll-option')) {
                     const option = e.target.dataset.option;
@@ -246,10 +251,8 @@
                 }
             });
             
-            // Initial poll results display
             updatePollResults();
 
-            // --- Admin Panel Logic ---
             settingsBtn.addEventListener('click', () => {
                 const adminPassword = prompt("Enter Admin Password:");
                 if (adminPassword === "admin123") {
@@ -262,8 +265,14 @@
             updateVideoBtn.addEventListener('click', () => {
                 const newVideoLink = videoLinkInput.value;
                 if (newVideoLink) {
-                    liveVideoPlayer.src = newVideoLink;
-                    liveVideoPlayer.load();
+                    // Extract YouTube video ID
+                    const videoID = newVideoLink.split('v=')[1];
+                    if (videoID) {
+                        const embedURL = `https://www.youtube.com/embed/${videoID}`;
+                        liveVideoPlayer.src = embedURL;
+                    } else {
+                        alert("Please enter a valid YouTube video URL.");
+                    }
                 }
             });
 
