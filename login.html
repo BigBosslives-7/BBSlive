@@ -170,19 +170,26 @@
   </div>
 
   <script>
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const voucherCode = document.getElementById('voucher-code').value.trim();
-      const errorMessage = document.getElementById('error-message');
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorMessage = document.getElementById("error-message");
 
-      if (username === "user" && password === "pass" && voucherCode === "access123") {
-        window.location.href = "index.html";
-      } else {
-        errorMessage.textContent = "Invalid username, password, or voucher code.";
-      }
-    });
-  </script>
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  if (res.ok) {
+    window.location.href = "/index.html";
+  } else {
+    const data = await res.json();
+    errorMessage.textContent = data.message;
+  }
+});
+</script>
+
 </body>
 </html>

@@ -199,6 +199,7 @@
   <header>
     <h1>Бадӟым ⴰⵎⵄⴻⵍⵍⴻⵎ</h1>
     <button id="settings-btn" class="btn-settings">Settings</button>
+    <button id="logout">Logout</button>
   </header>
 
   <div class="container">
@@ -282,6 +283,11 @@
         else if(iframe.webkitRequestFullscreen)iframe.webkitRequestFullscreen();
       };
     }
+
+       document.getElementById("logout").addEventListener("click", async () => {
+       await fetch("/logout", { method: "POST" });
+       window.location.href = "/login.html";
+       });
 
     // Chat
     function addChatMessage(user,text,self=false){
