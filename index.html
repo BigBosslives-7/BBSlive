@@ -432,7 +432,7 @@
             updateVideoBtn.addEventListener('click', () => {
                 const newVideoLink = videoLinkInput.value;
                 if (newVideoLink && newVideoLink.includes('youtube.com/embed/')) {
-                    liveVideoPlayer.src = `${newVideoLink}?modestbranding=1&rel=0&controls=1`;
+                    liveVideoPlayer.src = newVideoLink + '?modestbranding=1&rel=0';
                     alert("Video updated successfully!");
                 } else {
                     alert("Please enter a valid YouTube embed URL.");
