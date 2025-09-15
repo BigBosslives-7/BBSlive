@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream App</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #282828;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 1rem;
+            gap: 2rem;
+        }
+
+        .video-container {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        #live-video {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .interactive-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .comments-section, .poll-section {
+            background-color: #282828;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        #comments-list {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #444;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            background-color: #333;
+            border-radius: 5px;
+        }
+
+        .comment {
+            background-color: #444;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+        }
+
+        #comment-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #comment-input {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .poll-option {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .poll-option:hover {
+            background-color: #777;
+        }
+
+        #poll-results {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Live Stream</h1>
+    </header>
+
+    <main>
+        <div class="video-container">
+            <video id="live-video" controls autoplay>
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="interactive-section">
+            <div class="comments-section">
+                <h3>Live Chat</h3>
+                <div id="comments-list"></div>
+                <form id="comment-form">
+                    <input type="text" id="comment-input" placeholder="Say something..." required>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+
+            <div class="poll-section">
+                <h3>Live Poll</h3>
+                <p id="poll-question">What is your favorite programming language?</p>
+                <div class="poll-options">
+                    <button class="poll-option" data-option="js">JavaScript</button>
+                    <button class="poll-option" data-option="python">Python</button>
+                    <button class="poll-option" data-option="java">Java</button>
+                </div>
+                <div id="poll-results"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const commentForm = document.getElementById('comment-form');
+            const commentInput = document.getElementById('comment-input');
+            const commentsList = document.getElementById('comments-list');
+            const pollButtons = document.querySelectorAll('.poll-option');
+            const pollResultsDiv = document.getElementById('poll-results');
+
+            const pollResults = {
+                js: 0,
+                python: 0,
+                java: 0
+            };
+
+            commentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const commentText = commentInput.value;
+                if (commentText.trim() !== '') {
+                    addComment('User', commentText);
+                    commentInput.value = '';
+                }
+            });
+
+            function addComment(user, text) {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                commentDiv.innerHTML = `<strong>${user}:</strong> ${text}`;
+                commentsList.appendChild(commentDiv);
+                commentsList.scrollTop = commentsList.scrollHeight;
+            }
+
+            pollButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const option = e.target.dataset.option;
+                    if (pollResults.hasOwnProperty(option)) {
+                        pollResults[option]++;
+                        updatePollResults();
+                    }
+                });
+            });
+
+            function updatePollResults() {
+                pollResultsDiv.innerHTML = '';
+                for (const option in pollResults) {
+                    const resultParagraph = document.createElement('p');
+                    resultParagraph.textContent = `${option.charAt(0).toUpperCase() + option.slice(1)}: ${pollResults[option]} votes`;
+                    pollResultsDiv.appendChild(resultParagraph);
+                }
+            }
+
+            updatePollResults();
+        });
+    </script>
+</body>
+</html>
