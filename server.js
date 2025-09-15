@@ -9,10 +9,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
+
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// Middleware to check JWT
+// Middleware: check JWT
 function authenticate(req, res, next) {
   const auth = req.headers["authorization"];
   if (!auth) return res.status(401).json({ message: "Unauthorized" });
@@ -23,6 +24,14 @@ function authenticate(req, res, next) {
     req.user = decoded;
     next();
   });
+}
+
+// Middleware: admin only
+function adminOnly(req, res, next) {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admins only" });
+  }
+  next();
 }
 
 // Login route
@@ -64,6 +73,20 @@ app.get("/stream", authenticate, async (req, res) => {
   res.json(result.rows[0] || { video_url: null });
 });
 
-// Start server
+// Admin route → update stream
+app.post("/admin/update-stream", authenticate, adminOnly, async (req, res) => {
+  const { video_url } = req.body;
+  if (!video_url) return res.status(400).json({ message: "Missing video URL" });
+
+  try {
+    await pool.query("UPDATE streams SET video_url = $1 WHERE id = 1", [video_url]);
+    res.json({ message: "Video updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Start server (last line)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

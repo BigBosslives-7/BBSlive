@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 2rem; }
+    .card { background: #fff; padding: 2rem; border-radius: 8px; max-width: 500px; margin: auto; }
+    h2 { color: #333; }
+    input, textarea, button {
+      width: 100%; padding: 10px; margin: 10px 0;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+    button { background: #007bff; color: #fff; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .message { margin-top: 1rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Admin Panel</h2>
+    
+    <!-- Update Live Video URL -->
+    <h3>Update Live Video URL</h3>
+    <input type="text" id="video-url" placeholder="Paste new YouTube embed URL">
+    <button onclick="updateVideo()">Update Video</button>
+    <p id="video-message" class="message"></p>
+
+    <!-- Manage Polls (future feature) -->
+    <h3>Create Poll (Coming Soon 🚀)</h3>
+    <textarea placeholder="Enter poll question..." disabled></textarea>
+    <button disabled>Create Poll</button>
+  </div>
+
+  <script>
+    async function updateVideo() {
+      const videoUrl = document.getElementById("video-url").value.trim();
+      const res = await fetch("/admin/update-stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_url: videoUrl })
+      });
+
+      const msg = document.getElementById("video-message");
+      if (res.ok) {
+        msg.textContent = "✅ Video URL updated successfully!";
+        msg.style.color = "green";
+      } else {
+        const data = await res.json();
+        msg.textContent = "❌ Error: " + data.message;
+        msg.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
