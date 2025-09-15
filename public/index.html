@@ -2,360 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StreamVerse | Live</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-primary: #0A0B10;
-      --bg-secondary: #1C1E26;
-      --text-main: #EFEFEF;
-      --text-secondary: #A0A2B1;
-      --accent-purple: #8A46FF;
-      --accent-teal: #00D5B7;
-      --border-color: #333649;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #151515 ;
-      color: var(--text-main);
-      margin: 0; padding: 0;
-      overflow-x: hidden;
-    }
-    header {
-      background: var(--bg-primary);
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    header h1 { color: var(--accent-teal); margin: 0; }
-    .btn-settings {
-      background: var(--bg-secondary);
-      color: var(--text-main);
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
-      padding: 1.5rem;
-      max-width: 1400px;
-      margin: auto;
-    }
-
-    /* Video */
-    .yt-embed-holder {
-      position: relative;
-      aspect-ratio: 16/9;
-      overflow: hidden;
-      border-radius: 12px;
-      background: black;
-    }
-    .yt-embed-holder iframe {
-      width: 100%; height: 100%;
-      border: 0; pointer-events: none;
-    }
-    .control-toggle {
-      position: absolute; bottom: 1rem; right: 1rem;
-      background: rgba(0,0,0,0.5);
-      color: #fff;
-      border: none;
-      padding: 0.6rem 0.8rem;
-      border-radius: 50%;
-      cursor: pointer;
-      z-index: 10;
-    }
-    .video-controls {
-      position: absolute;
-      top: 0; right: 0; height: 100%; width: 200px;
-      background: rgba(28,30,38,0.95);
-      transform: translateX(100%);
-      transition: transform .3s;
-      padding: 1rem;
-      display: flex; flex-direction: column; gap: 1rem;
-      z-index: 9;
-    }
-    .video-controls.active { transform: translateX(0); }
-    .btn-control {
-      background: var(--accent-purple);
-      border: none; color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    /* Chat */
-    .chat-section {
-      display: flex; flex-direction: column;
-      background: #5c6b73 ;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .chat-header {
-      background: #20222f;
-      padding: 0.75rem 1rem;
-      font-weight: 600;
-      display: flex; justify-content: space-between;
-      align-items: center;
-    }
-    .live-indicator { color: #ff4c4c; font-size: 0.85rem; }
-    .chat-messages {
-      height: 300px; overflow-y: auto;
-      padding: 1rem;
-      display: flex; flex-direction: column;
-      gap: 0.5rem;
-      scroll-behavior: smooth;
-    }
-    .chat-message { display: flex; gap: 0.5rem; animation: fadeIn .3s ease; }
-    .chat-message .avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--accent-purple);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: bold;
-    }
-    .chat-message .bubble {
-      background: var(--bg-primary);
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      max-width: 75%;
-    }
-    .chat-message.self { flex-direction: row-reverse; }
-    .chat-message.self .bubble { background: var(--accent-teal); color: #0a0b10; }
-    .chat-input {
-      display: flex; border-top: 1px solid var(--border-color);
-    }
-    .chat-input input {
-      flex-grow: 1; padding: 0.75rem;
-      border: none; outline: none;
-      background: var(--bg-primary);
-      color: var(--text-main);
-    }
-    .chat-input button {
-      background: #00D5B7;
-      border: none; color: white;
-      padding: 0 1rem; cursor: pointer;
-    }
-
-    /* Poll */
-    .poll-section {
-      margin-top: 1.5rem;
-      background: #416788 ;
-      padding: 1.25rem;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-    .poll-header { font-weight: 600; margin-bottom: 0.75rem; }
-    .poll-options { display: flex; flex-direction: column; gap: 0.5rem; }
-    .poll-option {
-      background: #e0fbfc ;
-      border: 1px solid #2ec4b6 ;
-      padding: 0.75rem;
-      border-radius: 8px;
-      text-align: left;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .poll-option:hover { background: #2D303E; transform: scale(1.02); }
-    .poll-results { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-    .poll-bar {
-      background: #2d303e; border-radius: 8px;
-      overflow: hidden; height: 24px; position: relative;
-    }
-    .poll-fill { height: 100%; background: var(--accent-teal); width: 0%; transition: width .5s; }
-    .poll-label { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; }
-
-    /* Admin Panel */
-    #admin-panel {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 1000; justify-content: center; align-items: center;
-    }
-    .admin-card {
-      background: var(--bg-secondary);
-      padding: 2rem; border-radius: 12px;
-      width: 90%; max-width: 600px;
-    }
-
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-    @media(max-width: 1024px){
-      .container { grid-template-columns: 1fr; }
-      .video-controls { width: 100%; height: 160px; bottom: 0; top: auto;
-        transform: translateY(100%);
-        flex-direction: row; justify-content: space-around;
-      }
-      .video-controls.active { transform: translateY(0); }
-    }
-  </style>
+  <title>Live Stream</title>
 </head>
 <body>
-  <header>
-    <h1>Бадӟым ⴰⵎⵄⴻⵍⵍⴻⵎ</h1>
-    <button id="settings-btn" class="btn-settings">Settings</button>
-    <button id="logout">Logout</button>
-  </header>
+  <h2>Live Class</h2>
+  <div id="video-container">Loading...</div>
 
-  <div class="container">
-    <main>
-      <div class="yt-embed-holder">
-        <iframe id="live-video"
-          src="https://www.youtube.com/embed/mNdO8tJg2-o?enablejsapi=1&autoplay=1&mute=0&loop=1&controls=0&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3&playlist=mNdO8tJg2-o"
-          allow="autoplay; encrypted-media"
-        ></iframe>
-        <button id="control-toggle" class="control-toggle">🎛️</button>
-        <div id="video-controls" class="video-controls">
-          <div>
-            <label for="volume-slider">Volume</label>
-            <input type="range" id="volume-slider" min="0" max="100" step="1">
-          </div>
-          <button id="fullscreen-btn" class="btn-control">⛶ Fullscreen</button>
-        </div>
-      </div>
-    </main>
-
-    <aside>
-      <!-- Chat -->
-      <div class="chat-section">
-        <div class="chat-header">
-          <span>Live Chat</span>
-          <span class="live-indicator">🔴 Live</span>
-        </div>
-        <div id="comments-list" class="chat-messages"></div>
-        <form id="comment-form" class="chat-input">
-          <input type="text" id="comment-input" placeholder="Say something..." required>
-          <button type="submit">Send</button>
-        </form>
-      </div>
-      <!-- Poll -->
-      <div class="poll-section">
-        <div class="poll-header">Live Poll</div>
-        <p id="poll-question" class="poll-question">What is your favorite programming language?</p>
-        <div id="poll-options" class="poll-options"></div>
-        <div id="poll-results" class="poll-results"></div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel">
-    <div class="admin-card">
-      <h2>Admin Panel</h2>
-      <div>
-        <label>Video Link:</label>
-        <input type="text" id="video-link" placeholder="YouTube embed URL" style="width:100%">
-        <button id="update-video-btn" class="btn-control">Update Video</button>
-      </div>
-      <hr>
-      <div>
-        <label>Poll Question:</label>
-        <input type="text" id="poll-question-input" placeholder="Enter question" style="width:100%">
-        <label>Poll Options (comma-separated):</label>
-        <input type="text" id="poll-options-input" placeholder="Option1,Option2,Option3" style="width:100%">
-        <button id="update-poll-btn" class="btn-control">Update Poll</button>
-      </div>
-      <hr>
-      <h3>Poll Results (Admin)</h3>
-      <div id="admin-poll-results"></div>
-    </div>
-  </div>
-
-  <!-- YouTube API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    let player, pollResults={js:0,python:0,java:0};
+    async function loadStream() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login.html";
+        return;
+      }
 
-    function onYouTubeIframeAPIReady() {
-      player=new YT.Player('live-video',{events:{'onReady':onPlayerReady}});
-    }
-    function onPlayerReady() {
-      document.getElementById('control-toggle').onclick=()=>document.getElementById('video-controls').classList.toggle('active');
-      document.getElementById('volume-slider').oninput=e=>player.setVolume(e.target.value);
-      document.getElementById('fullscreen-btn').onclick=()=>{
-        const iframe=document.getElementById('live-video');
-        if(iframe.requestFullscreen)iframe.requestFullscreen();
-        else if(iframe.webkitRequestFullscreen)iframe.webkitRequestFullscreen();
-      };
-    }
+      const res = await fetch("/stream", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
 
-       document.getElementById("logout").addEventListener("click", async () => {
-       await fetch("/logout", { method: "POST" });
-       window.location.href = "/login.html";
-       });
+      if (!res.ok) {
+        window.location.href = "/login.html";
+        return;
+      }
 
-    // Chat
-    function addChatMessage(user,text,self=false){
-      const msg=document.createElement("div");
-      msg.className="chat-message"+(self?" self":"");
-      const avatar=document.createElement("div");
-      avatar.className="avatar"; avatar.textContent=user[0].toUpperCase();
-      const bubble=document.createElement("div");
-      bubble.className="bubble"; bubble.textContent=text;
-      msg.append(avatar,bubble);
-      document.getElementById("comments-list").appendChild(msg);
-      document.getElementById("comments-list").scrollTop=document.getElementById("comments-list").scrollHeight;
-    }
-    document.getElementById("comment-form").onsubmit=e=>{
-      e.preventDefault();
-      const input=document.getElementById("comment-input");
-      if(input.value.trim()){ addChatMessage("You",input.value,true); input.value=""; }
-    };
-
-    // Poll
-    function renderPollResults(){
-      const container=document.getElementById("poll-results");
-      const admin=document.getElementById("admin-poll-results");
-      container.innerHTML=""; admin.innerHTML="";
-      const total=Object.values(pollResults).reduce((a,b)=>a+b,0)||1;
-      for(let opt in pollResults){
-        const percent=Math.round((pollResults[opt]/total)*100);
-        const bar=document.createElement("div"); bar.className="poll-bar";
-        bar.innerHTML=`<div class="poll-fill" style="width:${percent}%"></div><span class="poll-label">${opt} — ${percent}%</span>`;
-        container.appendChild(bar);
-        admin.innerHTML+=`<p>${opt}: ${pollResults[opt]} votes</p>`;
+      const data = await res.json();
+      if (data.video_url) {
+        document.getElementById("video-container").innerHTML = `
+          <iframe src="${data.video_url}" width="800" height="450" frameborder="0" allowfullscreen></iframe>
+        `;
+      } else {
+        document.getElementById("video-container").textContent = "No live class available.";
       }
     }
-    function renderPollOptions(options){
-      const div=document.getElementById("poll-options");
-      div.innerHTML="";
-      options.forEach(opt=>{
-        const btn=document.createElement("button");
-        btn.className="poll-option"; btn.dataset.option=opt.toLowerCase().replace(/\s/g,'');
-        btn.textContent=opt;
-        btn.onclick=()=>{ pollResults[btn.dataset.option]++; renderPollResults(); };
-        div.appendChild(btn);
-      });
-      pollResults={}; options.forEach(opt=>pollResults[opt.toLowerCase().replace(/\s/g,'')]=0);
-      renderPollResults();
-    }
-    renderPollOptions(["JavaScript","Python","Java"]);
 
-    // Admin Panel
-    const settingsBtn=document.getElementById("settings-btn");
-    const adminPanel=document.getElementById("admin-panel");
-    settingsBtn.onclick=()=>{
-      const pass=prompt("Enter Admin Password:");
-      if(pass==="admin123")adminPanel.style.display="flex";
-      else alert("Incorrect password.");
-    };
-    adminPanel.onclick=e=>{ if(e.target.id==="admin-panel")adminPanel.style.display="none"; };
-    document.getElementById("update-video-btn").onclick=()=>{
-      const link=document.getElementById("video-link").value;
-      if(link.includes("youtube.com/embed/")){
-        player.loadVideoByUrl(link); alert("Video updated!");
-      }else alert("Invalid URL");
-    };
-    document.getElementById("update-poll-btn").onclick=()=>{
-      const q=document.getElementById("poll-question-input").value;
-      const opts=document.getElementById("poll-options-input").value.split(",").map(o=>o.trim()).filter(Boolean);
-      if(q&&opts.length){ document.getElementById("poll-question").textContent=q; renderPollOptions(opts); alert("Poll updated!"); }
-    };
+    loadStream();
   </script>
 </body>
 </html>

@@ -1,56 +1,69 @@
 import express from "express";
-import session from "express-session";
 import bcrypt from "bcrypt";
-import fs from "fs";
-import path from "path";
+import jwt from "jsonwebtoken";
+import pg from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
-
-// Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: "supersecretkey123", // change to env var in production
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // set secure:true if HTTPS
-}));
-
-// Load users
-const usersFile = path.join(process.cwd(), "users.json");
-let users = JSON.parse(fs.readFileSync(usersFile, "utf-8"));
-
-// Serve public folder
 app.use(express.static("public"));
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+// Middleware to check JWT
+function authenticate(req, res, next) {
+  const auth = req.headers["authorization"];
+  if (!auth) return res.status(401).json({ message: "Unauthorized" });
+
+  const token = auth.split(" ")[1];
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    req.user = decoded;
+    next();
+  });
+}
 
 // Login route
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
-  
-  if (!user) return res.status(401).json({ message: "Invalid credentials" });
+  const { username, password, voucher, deviceId } = req.body;
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json({ message: "Invalid credentials" });
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE username=$1", [username]);
+    const user = result.rows[0];
+    if (!user) return res.status(401).json({ message: "User not found" });
 
-  req.session.user = { username };
-  res.json({ success: true });
-});
+    const validPw = await bcrypt.compare(password, user.password_hash);
+    if (!validPw || user.voucher_code !== voucher) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-// Protect index.html
-app.get("/index.html", (req, res, next) => {
-  if (!req.session.user) {
-    return res.redirect("/login.html");
+    // Device binding
+    if (!user.device_id) {
+      await pool.query(
+        "UPDATE users SET device_id=$1, last_ip=$2 WHERE id=$3",
+        [deviceId, ip, user.id]
+      );
+    } else if (user.device_id !== deviceId) {
+      return res.status(403).json({ message: "This voucher is already used on another device." });
+    }
+
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: "2h" });
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
-  next();
 });
 
-// Logout
-app.post("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.json({ success: true });
-  });
+// Protected route → fetch latest video
+app.get("/stream", authenticate, async (req, res) => {
+  const result = await pool.query("SELECT * FROM streams ORDER BY created_at DESC LIMIT 1");
+  res.json(result.rows[0] || { video_url: null });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
