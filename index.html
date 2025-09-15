@@ -131,7 +131,7 @@
     <main>
         <div class="video-container">
             <iframe id="live-video"
-                src="https://www.youtube.com/embed/videoseries?list=PL3J-C4n1o3iL9P0eQ9k4xR1F1jN1j1-1J"
+                src="https://www.youtube.com/embed/n6AKJ3IZqRs"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen>
@@ -166,7 +166,7 @@
         <div class="admin-section">
             <h3>Video Settings</h3>
             <label for="video-link">Video Link:</label>
-            <input type="text" id="video-link" placeholder="Paste YouTube URL here" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+            <input type="text" id="video-link" placeholder="Paste YouTube Embed URL here" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
             <button id="update-video-btn" style="margin-top: 0.5rem;">Update Video</button>
         </div>
         <div class="admin-section" style="margin-top: 1rem;">
@@ -184,6 +184,37 @@
     </div>
 
     <script>
+        // Start of Service Worker code
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const serviceWorkerScript = `
+                    self.addEventListener('fetch', event => {
+                        if (event.request.mode === 'navigate') {
+                            event.respondWith(async function() {
+                                const preloadResponse = await event.preloadResponse;
+                                if (preloadResponse) {
+                                    return preloadResponse;
+                                }
+                                const networkResponse = await fetch(event.request);
+                                return networkResponse;
+                            }());
+                        }
+                    });
+                `;
+                const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(url)
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        // End of Service Worker code
+
         let pollResults = {
             js: 0,
             python: 0,
@@ -265,14 +296,7 @@
             updateVideoBtn.addEventListener('click', () => {
                 const newVideoLink = videoLinkInput.value;
                 if (newVideoLink) {
-                    // Extract YouTube video ID
-                    const videoID = newVideoLink.split('v=')[1];
-                    if (videoID) {
-                        const embedURL = `https://www.youtube.com/embed/${videoID}`;
-                        liveVideoPlayer.src = embedURL;
-                    } else {
-                        alert("Please enter a valid YouTube video URL.");
-                    }
+                    liveVideoPlayer.src = newVideoLink;
                 }
             });
 
