@@ -3,47 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Stream Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-container { background-color: #282828; padding: 2rem; border-radius: 8px; text-align: center; }
-        .login-container h2 { margin-bottom: 1rem; }
-        .login-container input { width: 90%; padding: 0.75rem; margin: 0.5rem 0; border: none; border-radius: 5px; }
-        .login-container button { width: 95%; padding: 0.75rem; border: none; border-radius: 5px; cursor: pointer; background-color: #3f51b5; color: #fff; margin-top: 1rem; }
-        .login-container button:hover { background-color: #303f9f; }
+        :root {
+            --background-color: #3C306E;
+            --card-color: #EDD340;
+            --text-color: #e0e0e0;
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --input-bg-color: #2e2e2e;
+            --input-border-color: #444;
+            --google-btn-color: #4285f4;
+            --google-btn-hover-color: #357ae8;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-card {
+            background-color: var(--card-color);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 380px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .login-card h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group input {
+            width: 85%;
+            padding: 1rem 1.25rem;
+            background-color: #F09999;
+            border: 1px solid var(--input-border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #FFFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        
+        .input-group label {
+            position: absolute;
+            top: 50%;
+            left: 1.25rem;
+            transform: translateY(-50%);
+            color: #FFFFFF ;
+            pointer-events: none;
+            transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+        }
+        
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label {
+            top: -0.5rem;
+            font-size: 0.75rem;
+            color: #FFFFFF);
+            background-color: #FFFFFF;
+            padding: 0 0.5rem;
+            left: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-google {
+            background-color: var(--google-btn-color);
+            color: #fff;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            background-color: var(--google-btn-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .link-text {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #999;
+        }
+
+        .link-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .link-text a:hover {
+            color: var(--primary-hover-color);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login to Stream</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <input type="text" id="voucher-code" placeholder="Voucher Code">
-        <button id="login-btn">Log In</button>
-        <p><a href="#" style="color: #64b5f6;">Forgot Password?</a></p>
-        <button id="google-login-btn">Log in with Google</button>
-        <p id="error-message" style="color: red;"></p>
+    <div class="login-card">
+        <h2>Log In to Your Account</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <input type="text" id="username" placeholder=" " required>
+                <label for="username">Username</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+            <div class="input-group">
+                <input type="text" id="voucher-code" placeholder=" " required>
+                <label for="voucher-code">Voucher Code</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Log In</button>
+            <p class="link-text"><a href="#">Forgot password?</a></p>
+            <div style="border-top: 1px solid #333; margin: 2rem 0;"></div>
+            <button type="button" class="btn btn-google">Log in with Google</button>
+            <p id="error-message" class="error-message"></p>
+        </form>
     </div>
 
     <script>
-        document.getElementById('login-btn').addEventListener('click', () => {
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const voucherCode = document.getElementById('voucher-code').value;
             const errorMessage = document.getElementById('error-message');
 
-            // Simple, hardcoded validation
             if (username === "user" && password === "pass" && voucherCode === "access123") {
-                // Redirect to the main streaming page
                 window.location.href = "index.html"; 
             } else {
                 errorMessage.textContent = "Invalid username, password, or voucher code.";
             }
-        });
-        
-        // Google login is just a placeholder
-        document.getElementById('google-login-btn').addEventListener('click', () => {
-            alert("Google login is a placeholder feature.");
         });
     </script>
 </body>
