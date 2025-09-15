@@ -3,371 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StreamVerse | Live</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>StreamVerse Live</title>
   <style>
-    /* Global & Theme */
-    :root {
-      --bg-primary: #0A0B10;
-      --bg-secondary: #1C1E26;
-      --text-main: #EFEFEF;
-      --text-secondary: #A0A2B1;
-      --accent-purple: #8A46FF;
-      --accent-teal: #00D5B7;
-      --border-color: #333649;
-    }
+    /* =================== Base =================== */
     body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-main);
       margin: 0;
-      padding: 0;
-    }
-
-    /* Layout */
-    .container {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 2rem;
-      padding: 2rem;
-      max-width: 1400px;
-      margin: auto;
-    }
-
-    header {
-      background: var(--bg-primary);
+      font-family: system-ui, sans-serif;
+      background: #0A0B10;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border-color);
+      min-height: 100vh;
+      color: #fff;
     }
-    header h1 { color: var(--accent-teal); margin: 0; }
-    .btn-settings {
-      background: var(--bg-secondary);
-      border: none;
-      color: var(--text-main);
-      padding: .75rem 1.25rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background .3s;
-    }
-    .btn-settings:hover, .btn-settings:focus { background: #2D303E; }
 
-    /* Video */
+    /* Video Holder */
     .yt-embed-holder {
-      width: 100%; 
+      position: relative;
+      width: 100%;
+      max-width: 960px;
       aspect-ratio: 16/9;
-      pointer-events: none;
+      background: black;
       overflow: hidden;
       border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
     .yt-embed-holder iframe {
       width: 100%;
       height: 100%;
-      border: none;
+      border: 0;
+      pointer-events: none; /* block YouTube UI */
     }
 
-    /* Cards */
-    .card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-    }
-    .card h3 { margin: 0 0 1rem; }
-
-    /* Live Chat */
-    #comments-list {
-      height: 350px;
-      overflow-y: auto;
-      border: 1px solid var(--border-color);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      aria-live: polite;
-    }
-    .comment {
-      background: var(--bg-primary);
-      padding: .5rem .75rem;
-      border-radius: 8px;
-      margin-bottom: .5rem;
-      animation: fadeIn .3s ease;
-    }
-    #comment-form { display: flex; gap: .5rem; }
-    #comment-input {
-      flex-grow: 1;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: .75rem;
-      border-radius: 8px;
-    }
-    .btn-send {
-      background: var(--accent-purple);
+    /* Toggle Button */
+    .control-toggle {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(0,0,0,0.5);
       border: none;
       color: #fff;
-      padding: .75rem 1rem;
-      border-radius: 8px;
+      font-size: 1.2rem;
+      padding: .6rem .8rem;
+      border-radius: 50%;
       cursor: pointer;
+      z-index: 5;
       transition: background .3s;
     }
-    .btn-send:hover { background: #723BCF; }
+    .control-toggle:hover { background: rgba(0,0,0,0.7); }
 
-    /* Poll */
-    .poll-option {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      padding: .75rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-      transition: background .2s, transform .2s;
-    }
-    .poll-option:hover { transform: scale(1.02); background: #2D303E; }
-
-    .poll-results-bar {
-      background: var(--border-color);
-      border-radius: 6px;
-      overflow: hidden;
-      height: 12px;
-      margin-top: .25rem;
-    }
-    .poll-fill {
-      background: var(--accent-teal);
+    /* Controls Panel (desktop: right slide-in) */
+    .video-controls {
+      position: absolute;
+      top: 0;
+      right: 0;
       height: 100%;
-      width: 0%;
-      transition: width .5s ease;
+      width: 220px;
+      background: rgba(28,30,38,0.95);
+      transform: translateX(100%);
+      transition: transform .3s ease;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      color: #fff;
+      z-index: 4;
+    }
+    .video-controls.active { transform: translateX(0); }
+
+    /* Mobile: bottom sheet */
+    @media(max-width: 768px){
+      .video-controls {
+        width: 100%;
+        height: 160px;
+        bottom: 0;
+        top: auto;
+        right: 0;
+        transform: translateY(100%);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+      }
+      .video-controls.active { transform: translateY(0); }
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Elements inside panel */
+    .video-controls label {
+      font-size: 0.9rem;
+      color: #aaa;
     }
-
-    /* Admin Modal */
-    #admin-panel {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.8);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .admin-card {
-      background: var(--bg-secondary);
-      padding: 2rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      animation: fadeIn .3s ease;
-    }
-    .admin-section { margin-bottom: 1rem; }
-    .admin-section input {
+    .video-controls input[type="range"] {
       width: 100%;
-      padding: .75rem;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-primary);
-      color: var(--text-main);
     }
-    .btn-update {
-      background: var(--accent-teal);
+    .btn-control {
+      background: #6a5acd;
       border: none;
-      color: var(--bg-primary);
-      padding: .75rem 1.25rem;
-      border-radius: 8px;
+      color: #fff;
+      padding: .6rem 1rem;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
-      margin-top: .5rem;
+      font-size: 0.9rem;
     }
-    .btn-update:hover { background: #00A38B; }
-
-    /* Mobile */
-    @media (max-width: 1024px) {
-      .container { grid-template-columns: 1fr; }
-    }
+    .btn-control:hover { background: #5848c2; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>StreamVerse</h1>
-    <button id="settings-btn" class="btn-settings">Settings</button>
-  </header>
+  <!-- Video Section -->
+  <div class="yt-embed-holder">
+    <iframe id="live-video"
+      src="https://www.youtube.com/embed/mNdO8tJg2-o?enablejsapi=1&autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3&playlist=mNdO8tJg2-o"
+      title="StreamVerse Live"
+      allow="autoplay; encrypted-media"
+    ></iframe>
 
-  <div class="container">
-    <main>
-      <div class="yt-embed-holder">
-        <iframe id="live-video"
-          src="https://www.youtube.com/embed/mNdO8tJg2-o?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&rel=0&playsinline=1&showinfo=0&iv_load_policy=3&playlist=mNdO8tJg2-o"
-          title="StreamVerse Live"
-          aria-hidden="true"
-          allow="autoplay; encrypted-media"
-        ></iframe>
-      </div>
-    </main>
+    <!-- Toggle Button -->
+    <button id="control-toggle" class="control-toggle" aria-label="Toggle video controls">🎛️</button>
 
-    <aside class="interactive-section">
-      <!-- Chat -->
-      <div class="comments-section card">
-        <h3>Live Chat</h3>
-        <div id="comments-list"></div>
-        <form id="comment-form">
-          <label for="comment-input" class="sr-only">Your message</label>
-          <input type="text" id="comment-input" placeholder="Say something..." required>
-          <button type="submit" class="btn-send">Send</button>
-        </form>
+    <!-- Slide Controls -->
+    <div id="video-controls" class="video-controls">
+      <div>
+        <label for="volume-slider">Volume</label>
+        <input type="range" id="volume-slider" min="0" max="100" step="1">
       </div>
-
-      <!-- Poll -->
-      <div class="poll-section card">
-        <h3>Live Poll</h3>
-        <p id="poll-question">What is your favorite programming language?</p>
-        <div class="poll-options">
-          <button class="poll-option" data-option="js">JavaScript</button>
-          <button class="poll-option" data-option="python">Python</button>
-          <button class="poll-option" data-option="java">Java</button>
-        </div>
-        <div id="poll-results"></div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel">
-    <div class="admin-card">
-      <h2>Admin Panel</h2>
-      <div class="admin-section">
-        <label for="admin-pass">Password</label>
-        <input type="password" id="admin-pass" placeholder="Enter password">
-        <button id="admin-login" class="btn-update">Login</button>
-      </div>
-      <div id="admin-tools" style="display:none;">
-        <div class="admin-section">
-          <h3>Video Settings</h3>
-          <input type="text" id="video-link" placeholder="YouTube embed URL">
-          <button id="update-video-btn" class="btn-update">Update Video</button>
-        </div>
-        <div class="admin-section">
-          <h3>Poll Settings</h3>
-          <input type="text" id="poll-question-input" placeholder="New poll question">
-          <input type="text" id="poll-options-input" placeholder="Comma separated options">
-          <button id="update-poll-btn" class="btn-update">Update Poll</button>
-        </div>
-        <div class="admin-section">
-          <h3>Poll Results</h3>
-          <div id="admin-poll-results"></div>
-        </div>
-      </div>
+      <button id="fullscreen-btn" class="btn-control">⛶ Fullscreen</button>
     </div>
   </div>
 
+  <!-- Load YouTube API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- All-in-one JS -->
   <script>
-    const pollResults = { js:0, python:0, java:0 };
-    const pollResultsDiv = document.getElementById('poll-results');
-    const adminPollResults = document.getElementById('admin-poll-results');
+    class VideoControls {
+      constructor(playerId, { toggleBtn, controlsPanel, volumeSlider, fullscreenBtn }) {
+        this.playerId = playerId;
+        this.toggleBtn = document.getElementById(toggleBtn);
+        this.controlsPanel = document.getElementById(controlsPanel);
+        this.volumeSlider = document.getElementById(volumeSlider);
+        this.fullscreenBtn = document.getElementById(fullscreenBtn);
+        this.hideTimer = null;
 
-    function updatePollResults() {
-      pollResultsDiv.innerHTML = '';
-      adminPollResults.innerHTML = '';
-      const totalVotes = Object.values(pollResults).reduce((a,b)=>a+b,0) || 1;
+        this.player = new YT.Player(this.playerId, {
+          events: { 'onReady': () => this.initEvents() }
+        });
+      }
 
-      for (const [key, count] of Object.entries(pollResults)) {
-        const percent = Math.round((count/totalVotes)*100);
-        const label = `${key.toUpperCase()}: ${count} votes (${percent}%)`;
+      initEvents() {
+        // Toggle controls
+        this.toggleBtn.addEventListener('click', () => {
+          this.controlsPanel.classList.toggle('active');
+        });
 
-        // public
-        const p = document.createElement('p');
-        p.textContent = label;
-        const bar = document.createElement('div');
-        bar.className = 'poll-results-bar';
-        const fill = document.createElement('div');
-        fill.className = 'poll-fill';
-        fill.style.width = percent + '%';
-        bar.appendChild(fill);
-        pollResultsDiv.append(p, bar);
+        // Volume slider
+        this.volumeSlider.addEventListener('input', e => {
+          if (this.player && this.player.setVolume) {
+            this.player.setVolume(e.target.value);
+          }
+        });
 
-        // admin
-        const adminP = document.createElement('p');
-        adminP.textContent = label;
-        adminPollResults.appendChild(adminP);
+        // Fullscreen
+        this.fullscreenBtn.addEventListener('click', () => {
+          const iframe = document.getElementById(this.playerId);
+          if (iframe.requestFullscreen) iframe.requestFullscreen();
+          else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+          else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+        });
+
+        // Auto-hide on inactivity
+        const videoHolder = this.toggleBtn.closest('.yt-embed-holder');
+        videoHolder.addEventListener('mousemove', () => {
+          this.showControls();
+        });
+      }
+
+      showControls() {
+        this.controlsPanel.classList.add('active');
+        clearTimeout(this.hideTimer);
+        this.hideTimer = setTimeout(() => {
+          this.controlsPanel.classList.remove('active');
+        }, 5000);
       }
     }
 
-    document.querySelector('.poll-options').addEventListener('click', e=>{
-      if(e.target.classList.contains('poll-option')){
-        const opt = e.target.dataset.option;
-        pollResults[opt]++;
-        updatePollResults();
-      }
-    });
-
-    // Chat
-    const commentsList = document.getElementById('comments-list');
-    document.getElementById('comment-form').addEventListener('submit', e=>{
-      e.preventDefault();
-      const input = document.getElementById('comment-input');
-      if(input.value.trim()){
-        const div = document.createElement('div');
-        div.className = 'comment';
-        div.innerHTML = `<strong>User:</strong> ${input.value}`;
-        commentsList.appendChild(div);
-        commentsList.scrollTo({ top: commentsList.scrollHeight, behavior: 'smooth' });
-        input.value = '';
-      }
-    });
-
-    // Admin
-    const settingsBtn = document.getElementById('settings-btn');
-    const adminPanel = document.getElementById('admin-panel');
-    const adminTools = document.getElementById('admin-tools');
-
-    settingsBtn.addEventListener('click', ()=>{ adminPanel.style.display='flex'; });
-    adminPanel.addEventListener('click', e=>{ if(e.target===adminPanel) adminPanel.style.display='none'; });
-
-    document.getElementById('admin-login').addEventListener('click', ()=>{
-      const pass = document.getElementById('admin-pass').value;
-      // fake hash for demo
-      const validHash = btoa('admin123');
-      if(btoa(pass)===validHash){
-        adminTools.style.display='block';
-        alert('Welcome, Admin!');
-      } else { alert('Wrong password'); }
-    });
-
-    document.getElementById('update-video-btn').addEventListener('click', ()=>{
-      const url = document.getElementById('video-link').value;
-      if(url.includes('youtube.com/embed/')){
-        document.getElementById('live-video').src = url + '?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1&rel=0&playsinline=1&showinfo=0&iv_load_policy=3&playlist=' + url.split('/embed/')[1];
-        alert('Video updated');
-      } else alert('Invalid embed URL');
-    });
-
-    document.getElementById('update-poll-btn').addEventListener('click', ()=>{
-      const q = document.getElementById('poll-question-input').value;
-      const opts = document.getElementById('poll-options-input').value.split(',').map(o=>o.trim()).filter(Boolean);
-      if(q && opts.length){
-        document.getElementById('poll-question').textContent = q;
-        const optionsDiv = document.querySelector('.poll-options');
-        optionsDiv.innerHTML='';
-        Object.keys(pollResults).forEach(k=>delete pollResults[k]);
-        opts.forEach(o=>{
-          const key = o.toLowerCase().replace(/[^a-z0-9]/g,'-');
-          pollResults[key]=0;
-          const btn=document.createElement('button');
-          btn.className='poll-option';
-          btn.dataset.option=key;
-          btn.textContent=o;
-          optionsDiv.appendChild(btn);
-        });
-        updatePollResults();
-      }
-    });
-
-    updatePollResults();
+    // Initialize after YouTube API loads
+    window.onYouTubeIframeAPIReady = () => {
+      new VideoControls('live-video', {
+        toggleBtn: 'control-toggle',
+        controlsPanel: 'video-controls',
+        volumeSlider: 'volume-slider',
+        fullscreenBtn: 'fullscreen-btn'
+      });
+    };
   </script>
 </body>
 </html>
