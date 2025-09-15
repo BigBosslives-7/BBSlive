@@ -3,52 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Stream App</title>
+    <title>StreamVerse | Live</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            margin: 0;
-            padding: 0;
+        /* Global & Desktop-First Styles */
+        :root {
+            --bg-primary: #0A0B10;
+            --bg-secondary: #1C1E26;
+            --text-main: #EFEFEF;
+            --text-secondary: #A0A2B1;
+            --accent-purple: #8A46FF;
+            --accent-teal: #00D5B7;
+            --border-color: #333649;
+            --error-color: #FF5E5E;
         }
 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: auto;
+        }
+        
+        /* Header Styling */
         header {
-            background-color: #282828;
-            padding: 1rem;
-            text-align: center;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            padding: 1.5rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border-color);
         }
 
         header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
             margin: 0;
+            color: var(--accent-teal);
         }
 
-        #settings-btn {
-            background-color: #555;
-            color: #fff;
+        .btn-settings {
+            background-color: var(--bg-secondary);
+            color: var(--text-main);
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
         }
 
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 1rem;
-            gap: 2rem;
+        .btn-settings:hover {
+            background-color: #2D303E;
         }
 
+        /* Video Player and Interactive Sections */
         .video-container {
-            flex: 2;
-            min-width: 300px;
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
 
         .video-container iframe {
@@ -57,38 +87,48 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 8px;
+            border: none;
         }
 
         .interactive-section {
-            flex: 1;
-            min-width: 300px;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
-        .comments-section, .poll-section, .admin-panel {
-            background-color: #282828;
+        /* Card-like components */
+        .card {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Live Chat Styling */
+        #comments-list {
+            height: 350px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
-        }
-
-        #comments-list {
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #444;
-            padding: 0.5rem;
             margin-bottom: 1rem;
-            background-color: #333;
-            border-radius: 5px;
         }
 
         .comment {
-            background-color: #444;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 5px;
+            background-color: var(--bg-primary);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
         }
 
         #comment-form {
@@ -97,58 +137,179 @@
         }
 
         #comment-input {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 5px;
-            border: none;
+            flex-grow: 1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
         }
 
-        .poll-option {
-            background-color: #555;
+        .btn-send {
+            background-color: var(--accent-purple);
             color: #fff;
             border: none;
-            padding: 0.75rem 1rem;
-            border-radius: 5px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
             cursor: pointer;
-            margin-right: 0.5rem;
+        }
+        
+        .btn-send:hover {
+            background-color: #723BCF;
+        }
+
+        /* Poll Styling */
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .poll-option {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
         .poll-option:hover {
-            background-color: #777;
+            transform: scale(1.02);
+            background-color: #2D303E;
         }
 
-        #poll-results {
-            margin-top: 1rem;
+        #poll-results p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        /* Admin Panel Styling */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-card {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-section input {
+            width: calc(100% - 2rem);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+        }
+        
+        .admin-section .btn-update {
+            background-color: var(--accent-teal);
+            color: var(--bg-primary);
+            font-weight: 600;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 0.75rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-section .btn-update:hover {
+            background-color: #00A38B;
+        }
+
+        /* ============================ */
+        /* === MOBILE-FIRST DESIGN === */
+        /* ============================ */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+            
+            .video-container {
+                order: 1; /* Puts the video first on mobile */
+            }
+            
+            .interactive-section {
+                order: 2; /* Puts chat/poll below the video */
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+            
+            header h1, .btn-settings {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Live Stream</h1>
-        <button id="settings-btn">Settings</button>
+        <h1>StreamVerse</h1>
+        <button id="settings-btn" class="btn-settings">Settings</button>
     </header>
 
-    <main>
-        <div class="video-container">
-            <iframe id="live-video"
-                src="https://www.youtube.com/embed/n6AKJ3IZqRs"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-            </iframe>
-        </div>
-
-        <div class="interactive-section">
-            <div class="comments-section">
+    <div class="container">
+        <main>
+            <div class="video-container">
+                <iframe id="live-video"
+                    src="https://www.youtube.com/embed/n6AKJ3IZqRs?modestbranding=1&rel=0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </main>
+        
+        <aside class="interactive-section">
+            <div class="comments-section card">
                 <h3>Live Chat</h3>
                 <div id="comments-list"></div>
                 <form id="comment-form">
                     <input type="text" id="comment-input" placeholder="Say something..." required>
-                    <button type="submit">Send</button>
+                    <button type="submit" class="btn-send">Send</button>
                 </form>
             </div>
 
-            <div class="poll-section">
+            <div class="poll-section card">
                 <h3>Live Poll</h3>
                 <p id="poll-question">What is your favorite programming language?</p>
                 <div class="poll-options">
@@ -158,63 +319,34 @@
                 </div>
                 <div id="poll-results"></div>
             </div>
-        </div>
-    </main>
+        </aside>
+    </div>
     
-    <div id="admin-panel" class="admin-panel" style="display: none;">
-        <h2>Admin Panel</h2>
-        <div class="admin-section">
-            <h3>Video Settings</h3>
-            <label for="video-link">Video Link:</label>
-            <input type="text" id="video-link" placeholder="Paste YouTube Embed URL here" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
-            <button id="update-video-btn" style="margin-top: 0.5rem;">Update Video</button>
-        </div>
-        <div class="admin-section" style="margin-top: 1rem;">
-            <h3>Poll Settings</h3>
-            <label for="poll-question-input">Poll Question:</label>
-            <input type="text" id="poll-question-input" placeholder="New poll question" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
-            <label for="poll-options-input" style="display: block; margin-top: 1rem;">Poll Options (comma-separated):</label>
-            <input type="text" id="poll-options-input" placeholder="e.g., Option1,Option2,Option3" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
-            <button id="update-poll-btn" style="margin-top: 0.5rem;">Update Poll</button>
-        </div>
-        <div class="admin-section" style="margin-top: 1rem;">
-            <h3>Poll Results</h3>
-            <div id="admin-poll-results"></div>
+    <div id="admin-panel" class="admin-panel">
+        <div class="admin-card">
+            <h2>Admin Panel</h2>
+            <div class="admin-section">
+                <h3>Video Settings</h3>
+                <label for="video-link">YouTube Embed URL:</label>
+                <input type="text" id="video-link" placeholder="e.g., https://www.youtube.com/embed/n6AKJ3IZqRs">
+                <button id="update-video-btn" class="btn-update">Update Video</button>
+            </div>
+            <div class="admin-section">
+                <h3>Poll Settings</h3>
+                <label for="poll-question-input">Poll Question:</label>
+                <input type="text" id="poll-question-input" placeholder="New poll question">
+                <label for="poll-options-input">Poll Options (comma-separated):</label>
+                <input type="text" id="poll-options-input" placeholder="e.g., Option1,Option2,Option3">
+                <button id="update-poll-btn" class="btn-update">Update Poll</button>
+            </div>
+            <div class="admin-section">
+                <h3>Poll Results</h3>
+                <div id="admin-poll-results"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Start of Service Worker code
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const serviceWorkerScript = `
-                    self.addEventListener('fetch', event => {
-                        if (event.request.mode === 'navigate') {
-                            event.respondWith(async function() {
-                                const preloadResponse = await event.preloadResponse;
-                                if (preloadResponse) {
-                                    return preloadResponse;
-                                }
-                                const networkResponse = await fetch(event.request);
-                                return networkResponse;
-                            }());
-                        }
-                    });
-                `;
-                const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
-                const url = URL.createObjectURL(blob);
-
-                navigator.serviceWorker.register(url)
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed:', error);
-                    });
-            });
-        }
-        // End of Service Worker code
-
         let pollResults = {
             js: 0,
             python: 0,
@@ -227,7 +359,6 @@
             const commentsList = document.getElementById('comments-list');
             const pollOptionsDiv = document.querySelector('.poll-options');
             const pollResultsDiv = document.getElementById('poll-results');
-
             const settingsBtn = document.getElementById('settings-btn');
             const adminPanel = document.getElementById('admin-panel');
             const updateVideoBtn = document.getElementById('update-video-btn');
@@ -261,11 +392,9 @@
                 adminPollResults.innerHTML = '';
                 for (const option in pollResults) {
                     const resultText = `${option.charAt(0).toUpperCase() + option.slice(1)}: ${pollResults[option]} votes`;
-                    
                     const publicResultP = document.createElement('p');
                     publicResultP.textContent = resultText;
                     pollResultsDiv.appendChild(publicResultP);
-                    
                     const adminResultP = document.createElement('p');
                     adminResultP.textContent = resultText;
                     adminPollResults.appendChild(adminResultP);
@@ -287,16 +416,25 @@
             settingsBtn.addEventListener('click', () => {
                 const adminPassword = prompt("Enter Admin Password:");
                 if (adminPassword === "admin123") {
-                    adminPanel.style.display = 'block';
+                    adminPanel.style.display = 'flex';
                 } else {
                     alert("Incorrect password.");
+                }
+            });
+            
+            adminPanel.addEventListener('click', (e) => {
+                if (e.target.id === 'admin-panel') {
+                    adminPanel.style.display = 'none';
                 }
             });
 
             updateVideoBtn.addEventListener('click', () => {
                 const newVideoLink = videoLinkInput.value;
-                if (newVideoLink) {
-                    liveVideoPlayer.src = newVideoLink;
+                if (newVideoLink && newVideoLink.includes('youtube.com/embed/')) {
+                    liveVideoPlayer.src = newVideoLink + '?modestbranding=1&rel=0';
+                    alert("Video updated successfully!");
+                } else {
+                    alert("Please enter a valid YouTube embed URL.");
                 }
             });
 
@@ -306,7 +444,6 @@
 
                 if (newQuestion && newOptions.length > 0) {
                     pollQuestion.textContent = newQuestion;
-                    
                     pollOptionsDiv.innerHTML = '';
                     pollResultsDiv.innerHTML = '';
                     
@@ -323,6 +460,7 @@
                         pollResults[optionText.toLowerCase().replace(/\s/g, '')] = 0;
                     });
                     updatePollResults();
+                    alert("Poll updated successfully!");
                 }
             });
         });
