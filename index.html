@@ -72,29 +72,20 @@
         }
 
         /* Video Player and Interactive Sections */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-        }
+       .yt-embed-holder{ 
+     width: 100%; overflow: hidden;
+     aspect-ratio: 16/9;
+     pointer-events: none; 
+     }
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+.yt-embed-holder iframe{
+     width: 300%;
+     height: 100%;
+     margin-left: -100%;
+     }
 
-        .interactive-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
+        
+
 
         /* Card-like components */
         .card {
@@ -290,13 +281,10 @@
 
     <div class="container">
         <main>
-            <div class="video-container">
+            <div class="yt-embed-holder">
                 <iframe id="live-video"
-    src="https://www.youtube.com/embed/n6AKJ3IZqRs?modestbranding=1&rel=0&controls=1"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen>
-</iframe>
+                    src="https://www.youtube.com/embed/mNdO8tJg2-o?si=HGHNFx9mNTSwlbni& autoplay=1&mute=1&loop=1&controls=0&color=white& modestbranding=0&rel=0&playsinline=1&enablejsapi=1& playlist=mNdO8tJg2-o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
             </div>
         </main>
         
